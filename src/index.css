@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+  --color-orange-950: #431407;
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --shadow-glass-light: 0 8px 32px 0 rgba(30, 41, 59, 0.1);
+  --shadow-glass-strong: 0 8px 30px 0 rgba(0, 0, 0, 0.12);
+}
+
+@layer base {
+  body {
+    @apply transition-colors duration-500 antialiased cursor-default;
+  }
+}
+
+/* --- PROFESSIONAL INTELLIGENCE REPORT PRINT SYSTEM --- */
+@media print {
+
+  /* Ensure colors and backgrounds render */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Reset layout for print */
+  body {
+    background: white !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Typography Refinement */
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: #0f172a !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Specific Print Layout Utilities */
+  .print-page {
+    width: 210mm;
+    min-height: 297mm;
+    /* A4 height - allow growth but start at full page */
+    padding: 20mm 15mm;
+    margin: 0 auto;
+    page-break-after: always;
+    break-after: page;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background: white !important;
+    overflow: hidden;
+    /* Prevent bleed */
+  }
+
+  .print-page:last-of-type {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* Prevent elements from splitting across pages */
+  .print-page>div,
+  .print-card,
+  svg,
+  .grid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Fix for charts and visuals */
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Remove transitions but PRESERVE layout transforms */
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Hide web-only elements */
+  .no-print,
+  nav,
+  footer,
+  button:not(.print-only),
+  .fixed,
+  .absolute.inset-0:not(.print-element) {
+    display: none !important;
+  }
+
+  .print-report-container {
+    display: block !important;
+  }
+}
+
+
+
+
+
+
+
+.dark body {
+  @apply bg-slate-950 text-slate-200 selection:bg-orange-500/30 selection:text-orange-200;
+}
+
+.light body {
+  @apply bg-slate-100 text-slate-900 selection:bg-orange-600/20 selection:text-orange-900;
+}
+
+@layer utilities {
+  .glass-card {
+    @apply transition-all duration-500 backdrop-blur-xl border;
+  }
+
+  .dark .glass-card {
+    @apply bg-slate-900/40 border-white/10 shadow-glass hover:border-orange-500/30;
+  }
+
+  .light .glass-card {
+    @apply bg-white border-slate-200 shadow-glass-strong hover:border-orange-600/30;
+  }
+
+  .glass-morphism {
+    @apply backdrop-blur-md border;
+  }
+
+  .dark .glass-morphism {
+    @apply bg-slate-900/60 border-white/10;
+  }
+
+  .light .glass-morphism {
+    @apply bg-white border-slate-200 shadow-lg;
+  }
+
+  .glow-text {
+    @apply transition-all duration-500;
+  }
+
+  .dark .glow-text {
+    text-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+  }
+
+  .light .glow-text {
+    text-shadow: 0 0 15px rgba(234, 88, 12, 0.2);
+  }
+
+  .glow-border {
+    @apply transition-all duration-500;
+  }
+
+  .dark .glow-border {
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
+  }
+
+  .light .glow-border {
+    box-shadow: 0 4px 15px rgba(234, 88, 12, 0.1);
+  }
+
+  .bg-grid-white {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  }
+
+  .light .bg-grid-white {
+    background-image: radial-gradient(circle, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .section-alt {
+    @apply transition-colors duration-500;
+  }
+
+  .dark .section-alt {
+    @apply bg-slate-900/50;
+  }
+
+  .light .section-alt {
+    @apply bg-slate-200/50;
+  }
+
+  /* Theme-aware Logo Filter */
+  .logo-blend {
+    @apply transition-all duration-500;
+  }
+
+  .dark .logo-blend {
+    filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(1.2);
+    mix-blend-mode: screen;
+  }
+
+  .light .logo-blend {
+    filter: none;
+    mix-blend-mode: multiply;
+    /* Blends white bg with light theme white/gray */
+  }
+
+  @keyframes pulse {
+
+    0%,
+    100% {
+      opacity: 0.1;
+    }
+
+    50% {
+      opacity: 0.3;
+    }
+  }
+}
