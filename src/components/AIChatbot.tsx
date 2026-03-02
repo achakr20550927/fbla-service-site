@@ -49,11 +49,13 @@ export const AIChatbot: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+                    'HTTP-Referer': 'https://silencetheviolenceec.com',
+                    'X-Title': 'Silence the Violence Assistant',
                 },
                 body: JSON.stringify({
                     model: 'gpt-4o-mini',
@@ -164,8 +166,8 @@ export const AIChatbot: React.FC = () => {
                                         </div>
                                         <div
                                             className={`p-4 rounded-2xl text-xs font-medium leading-relaxed ${message.role === 'user'
-                                                ? 'bg-orange-600 text-white shadow-lg'
-                                                : 'bg-white/5 border border-white/10 text-slate-300'
+                                                ? 'bg-orange-600 text-black shadow-lg'
+                                                : 'bg-white/90 border border-white/10 text-black'
                                                 }`}
                                         >
                                             {message.content}
