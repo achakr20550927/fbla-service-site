@@ -51,13 +51,10 @@ export const AIChatbot: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-                    'HTTP-Referer': 'https://silencetheviolenceec.com',
-                    'X-Title': 'Silence the Violence Assistant',
                 },
                 body: JSON.stringify({
                     model: 'gpt-4o-mini',
