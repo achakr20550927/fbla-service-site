@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, User, Loader2, Sparkles, Shield, Info } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
     id: string;
@@ -213,10 +215,21 @@ export const AIChatbot: React.FC = () => {
                                         </div>
 
                                         <div className={`p-5 rounded-3xl text-[13px] leading-[1.6] shadow-xl ${message.role === 'user'
-                                                ? 'bg-orange-600 text-black font-bold rounded-tr-none'
-                                                : 'bg-white/95 backdrop-blur-md text-slate-950 font-medium rounded-tl-none border border-white/50'
+                                            ? 'bg-orange-600 text-black font-bold rounded-tr-none'
+                                            : 'bg-white/95 backdrop-blur-md text-slate-950 font-medium rounded-tl-none border border-white/50'
                                             }`}>
-                                            {message.content}
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                components={{
+                                                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                                                    ul: ({ node, ...props }) => <ul className="list-disc ml-4 mb-2" {...props} />,
+                                                    ol: ({ node, ...props }) => <ol className="list-decimal ml-4 mb-2" {...props} />,
+                                                    li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                                    strong: ({ node, ...props }) => <strong className="font-extrabold" {...props} />,
+                                                }}
+                                            >
+                                                {message.content}
+                                            </ReactMarkdown>
                                         </div>
                                     </div>
                                 </motion.div>
