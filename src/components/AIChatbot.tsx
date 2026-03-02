@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Bot, User, Loader2, Sparkles, Shield, Info } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Sparkles, Shield, Info } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -196,7 +196,7 @@ export const AIChatbot: React.FC = () => {
 
                         {/* Content: Smooth Scrolling Messages */}
                         <div className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth scrollbar-thin scrollbar-thumb-white/10 bg-slate-950/20">
-                            {messages.map((message, idx) => (
+                            {messages.map((message) => (
                                 <motion.div
                                     key={message.id}
                                     initial={{ opacity: 0, y: 10, x: message.role === 'user' ? 10 : -10 }}
