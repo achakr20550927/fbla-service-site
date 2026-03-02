@@ -76,7 +76,11 @@ export const AIChatbot: React.FC = () => {
                 }),
             });
 
-            if (!response.ok) throw new Error('Failed to fetch from OpenAI');
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('OpenAI API Error:', response.status, errorData);
+                throw new Error(`OpenAI API returned ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
+            }
 
             const data = await response.json();
             const assistantMessage: Message = {
@@ -87,14 +91,14 @@ export const AIChatbot: React.FC = () => {
             };
 
             setMessages((prev) => [...prev, assistantMessage]);
-        } catch (error) {
-            console.error('Chatbot error:', error);
+        } catch (error: any) {
+            console.error('Chatbot error details:', error);
             setMessages((prev) => [
                 ...prev,
                 {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',
-                    content: "I'm sorry, I'm having trouble connecting right now. Please try again or check our resources page for immediate information.",
+                    content: `Connection Error: ${error.message || 'I encountered an unexpected issue.'} Please verify your API key and network connection.`,
                     timestamp: new Date(),
                 },
             ]);
@@ -160,8 +164,8 @@ export const AIChatbot: React.FC = () => {
                                         </div>
                                         <div
                                             className={`p-4 rounded-2xl text-xs font-medium leading-relaxed ${message.role === 'user'
-                                                    ? 'bg-orange-600 text-white shadow-lg'
-                                                    : 'bg-white/5 border border-white/10 text-slate-300'
+                                                ? 'bg-orange-600 text-white shadow-lg'
+                                                : 'bg-white/5 border border-white/10 text-slate-300'
                                                 }`}
                                         >
                                             {message.content}
