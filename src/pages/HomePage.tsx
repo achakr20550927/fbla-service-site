@@ -2,17 +2,36 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, Map as MapIcon, BookOpen, ArrowRight, ShieldCheck, TrendingDown, Zap, Globe, Target } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getCountyByZipcode, isMarylandZipcode } from '../lib/zipcodes';
 
 export const HomePage: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [newsletterEmail, setNewsletterEmail] = React.useState('');
   const [newsletterStatus, setNewsletterStatus] = React.useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [zipError, setZipError] = React.useState('');
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (search.trim()) {
-      navigate(`/map?query=${encodeURIComponent(search)}`);
+    setZipError('');
+    const query = search.trim();
+    if (query) {
+      if (/^\d{5}$/.test(query)) {
+        if (isMarylandZipcode(query)) {
+          const countyId = getCountyByZipcode(query);
+          if (countyId) {
+            navigate(`/report/${countyId}`);
+          } else {
+            // A somewhat rare case where it's a valid MD zip range but we don't have it explicitly mapped
+            // We can fall back to map or show "Not found"
+            setZipError("ZIP code not currently mapped to a county.");
+          }
+        } else {
+          setZipError("Please enter a ZIP code in Maryland.");
+        }
+        return;
+      }
+      navigate(`/map?query=${encodeURIComponent(query)}`);
     }
   };
 
@@ -114,6 +133,11 @@ export const HomePage: React.FC = () => {
                     <Search className="w-6 h-6 text-white" />
                   </button>
                 </div>
+                {zipError && (
+                  <div className="absolute -bottom-8 left-0 right-0 text-center text-red-500 font-bold bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-lg py-1 shadow-sm">
+                    {zipError}
+                  </div>
+                )}
               </form>
 
               <div className="flex flex-wrap justify-center gap-6">
