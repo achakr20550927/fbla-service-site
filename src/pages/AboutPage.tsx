@@ -208,6 +208,7 @@ export const AboutPage: React.FC = () => {
       </section>
 
       {/* Strategic Alliance */}
+      {false && (
       <section className="py-48 relative overflow-hidden">
         <div className="absolute inset-0 bg-orange-600/5"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -253,6 +254,7 @@ export const AboutPage: React.FC = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Contact Interface */}
       <section className="py-32 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
