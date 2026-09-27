@@ -1,35 +1,73 @@
-# Silence the Violence
+# React + TypeScript + Vite
 
-A student-led Maryland community safety resource from Centennial High School FBLA.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Develop and verify
+Currently, two official plugins are available:
 
-Use Node.js 22.18+ (Node 24 recommended).
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-```sh
-npm ci
-npm run dev
-npm run test
-npm run lint
-npm run build
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-The site uses React, TypeScript, Vite, and hash routing. Netlify builds `dist` using `netlify.toml`; other static hosts can serve the same build. Generated build files are not source files.
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-## Data
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-`src/lib/data.ts` contains source-linked county rates, statewide trends, and resource listings. See `docs/DATA_SOURCES.md` and the website’s Sources & Methodology page before editing any figure. Missing/suppressed rates must remain `null`, never zero. Do not derive annual counts or demographic estimates from rates.
-
-`src/data/boundaries.json` contains simplified MD iMAP geometry in display coordinates. `scripts/build-boundaries.py` reproduces the paths from the documented GeoJSON query.
-
-ZIP lookup is inherited project data, not an authoritative postal crosswalk. Search shows a suggested county for confirmation; county-name selection is always available.
-
-## Contact and privacy
-
-The contact form retains the project’s existing public Web3Forms access key. It sends a name, email, subject, and message to the configured recipient. Test delivery with the project owner before launch; automated checks do not send messages. The direct email link remains available if the service fails.
-
-The resource guide filters the local directory. It makes no AI requests, requires no API secret, and stores no conversation. The former AI proxy and its dependencies have been removed. The existing local `.env` is ignored and unused by the application; do not commit it.
-
-## Publishing
-
-Build and lint must pass before publishing. The repository’s current hosting configuration targets Netlify. No hosting migration is required for the redesign. The contact form provider and external service links operate independently of the static host.
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
