@@ -40,11 +40,25 @@ test("every county profile contains official context and labeled model inputs", 
     assert.equal(profile.racePattern.reduce((sum, item) => sum + item.percentage, 0), 100);
     assert.equal(profile.sexPattern.reduce((sum, item) => sum + item.percentage, 0), 100);
     assert.equal(profile.intentMix.reduce((sum, item) => sum + item.percentage, 0), 100);
-    assert.equal(profile.modeledTrend.length, 5);
+    assert.equal(profile.modeledTrend.length, 10);
+    assert.deepEqual(
+      profile.modeledTrend.map((point) => point.year),
+      [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    );
+    for (const point of profile.modeledTrend) {
+      assert.ok(point.total > 0);
+      assert.ok(point.nonfatal > 0);
+      assert.ok(point.fatalityCount > 0);
+      assert.ok(point.nonfatalCount > 0);
+    }
   }
   assert.equal(countyProfiles.howard.population, 339668);
   assert.equal(countyProfiles["baltimore-city"].povertyRate, 18);
   assert.equal(countyProfiles.caroline.estimatedAnnualFatalities, null);
+  assert.notDeepEqual(
+    countyProfiles.howard.modeledTrend.map((point) => point.total),
+    countyProfiles.montgomery.modeledTrend.map((point) => point.total),
+  );
 });
 test("published suppression remains missing data, never zero or an invented estimate", () => {
   assert.deepEqual(

@@ -79,6 +79,12 @@ export function CountyReportPage() {
       : view === "annual"
         ? data.estimatedAnnualFatalities
         : data.estimatedAnnualFatalities * 5;
+  const latestModel = data.modeledTrend.at(-1)!;
+  const jumpTo = (id: string) => {
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="report-page report-experience">
@@ -152,12 +158,12 @@ export function CountyReportPage() {
 
       <nav className="report-jump-nav no-print" aria-label="Report sections">
         <div className="shell">
-          <a href="#overview">Overview</a>
-          <a href="#patterns">Patterns</a>
-          <a href="#people">People</a>
-          <a href="#prevention">Prevention</a>
-          <a href="#support">Local support</a>
-          <a href="#methodology">Methodology</a>
+          <button onClick={() => jumpTo("overview")}>Overview</button>
+          <button onClick={() => jumpTo("patterns")}>Patterns</button>
+          <button onClick={() => jumpTo("people")}>People</button>
+          <button onClick={() => jumpTo("prevention")}>Prevention</button>
+          <button onClick={() => jumpTo("support")}>Local support</button>
+          <button onClick={() => jumpTo("methodology")}>Methodology</button>
         </div>
       </nav>
 
@@ -259,6 +265,31 @@ export function CountyReportPage() {
               </p>
             </div>
             <CountyTrendChart data={data.modeledTrend} county={data.name} />
+            <div
+              className="burden-grid"
+              aria-label="Modeled county burden summary"
+            >
+              <article>
+                <span>2024 firearm deaths</span>
+                <strong>≈ {latestModel.fatalityCount}</strong>
+                <small>modeled count</small>
+              </article>
+              <article>
+                <span>2024 nonfatal injuries</span>
+                <strong>≈ {latestModel.nonfatalCount}</strong>
+                <small>modeled count</small>
+              </article>
+              <article>
+                <span>Modeled peak year</span>
+                <strong>{data.peakYear}</strong>
+                <small>highest total rate</small>
+              </article>
+              <article>
+                <span>Above state pattern</span>
+                <strong>{data.yearsAboveState}/5</strong>
+                <small>comparable years, 2019–2023</small>
+              </article>
+            </div>
             <div className="intent-card">
               <div className="intent-copy">
                 <span className="chart-label">MODELED PREVIEW</span>

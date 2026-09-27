@@ -72,12 +72,12 @@ export function SourcesPage() {
       <h2>Modeled report previews</h2>
       <p>
         County reports include clearly marked previews for estimated annual
-        fatalities, county trend lines, intent mix, and demographic
-        distributions. They restore the richer experience of the original
-        project while the team prepares official dashboard exports. Annual
-        fatality estimates are calculated from the published rate and 2024
-        population. Other preview panels use transparent interface models and
-        must not be cited as observed county findings.
+        fatalities, ten-year county patterns, nonfatal injury, youth deaths,
+        intent mix, and demographic distributions. They restore the richer
+        experience of the original project while the team prepares official
+        dashboard exports. Published-rate-derived fatality estimates use the
+        2024 population. Other preview panels use transparent, county-specific
+        interface models and must not be cited as observed county findings.
       </p>
       <p>
         Preview figures are labeled “Modeled preview” wherever they appear and

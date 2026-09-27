@@ -28,7 +28,7 @@ The report uses 2024 population estimates, poverty percentages, and median house
 
 ## Modeled report previews
 
-The richer county interface includes deliberately labeled preview values for estimated annual fatalities, county trend histories, intent mix, age, race/ethnicity, and sex. Estimated fatalities are calculated from the published rate and Census population; values remain unavailable for counties whose published rate is suppressed. Trend lines are scaled from the published Maryland pattern. Distribution panels are interface placeholders based on broad urban, suburban, and rural profiles.
+The richer county interface includes deliberately labeled preview values for estimated annual fatalities, county trend histories, nonfatal injuries, youth deaths, intent mix, age, race/ethnicity, and sex. Published-rate-derived annual fatalities remain unavailable for counties whose rate is suppressed. The ten-year explorer uses a transparent interface model with county-specific variation around a Maryland-shaped pattern; suppressed counties retain a design preview that is not derived from the hidden rate. Distribution panels are interface placeholders based on broad urban, suburban, and rural profiles.
 
 These previews are not observed county findings. They are labeled “Modeled preview” in the interface and must be replaced with official Maryland dashboard exports before being cited in a presentation, report, or policy decision.
 

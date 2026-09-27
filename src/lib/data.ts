@@ -69,7 +69,13 @@ export interface CountyProfile extends CountyData {
     total: number;
     homicide: number;
     suicide: number;
+    nonfatal: number;
+    youth: number;
+    fatalityCount: number;
+    nonfatalCount: number;
   }[];
+  peakYear: number;
+  yearsAboveState: number;
   intentMix: {
     label: string;
     percentage: number;
@@ -139,6 +145,8 @@ export const stateTrend = [
   { year: 2023, total: 12.31, homicide: 8.08, suicide: 4.07 },
 ];
 
+const annualShape = [0.82, 0.86, 0.89, 0.94, 1, 1.07, 1.18, 1.11, 1.03, 1];
+
 function modeledMix(id: string) {
   if (urbanCounties.has(id)) return [70, 25, 2, 3];
   if (ruralCounties.has(id)) return [35, 59, 3, 3];
@@ -157,14 +165,6 @@ export const countyProfiles: Record<string, CountyProfile> = Object.fromEntries(
       county.rate === null
         ? null
         : Math.max(1, Math.round((county.rate * population) / 100000));
-    const scale =
-      county.rate === null ? 1 : county.rate / stateTrend.at(-1)!.total;
-    const modeledTrend = stateTrend.map((point) => ({
-      year: point.year,
-      total: Number((point.total * scale).toFixed(1)),
-      homicide: Number((point.homicide * scale).toFixed(1)),
-      suicide: Number((point.suicide * scale).toFixed(1)),
-    }));
     const mix = modeledMix(county.id);
     const intentMix = [
       ["Homicide", mix[0], "#e36f4a"],
@@ -222,6 +222,46 @@ export const countyProfiles: Record<string, CountyProfile> = Object.fromEntries(
       { label: "Male", percentage: 86 - variation },
       { label: "Female", percentage: 14 + variation },
     ];
+    const modelBase =
+      county.rate ?? STATE_RATE * (0.68 + (countyIndex % 7) * 0.07);
+    const modeledTrend = annualShape.map((shape, index) => {
+      const year = 2015 + index;
+      const countyVariation =
+        1 + Math.sin((countyIndex + 2) * (index + 1) * 0.77) * 0.075;
+      const total = Number((modelBase * shape * countyVariation).toFixed(1));
+      const homicide = Number((total * (mix[0] / 100)).toFixed(1));
+      const suicide = Number((total * (mix[1] / 100)).toFixed(1));
+      const nonfatal = Number(
+        (total * (1.08 + (countyIndex % 5) * 0.075)).toFixed(1),
+      );
+      const youth = Number(
+        (total * (0.08 + (countyIndex % 4) * 0.018)).toFixed(1),
+      );
+      return {
+        year,
+        total,
+        homicide,
+        suicide,
+        nonfatal,
+        youth,
+        fatalityCount: Math.max(1, Math.round((total * population) / 100000)),
+        nonfatalCount: Math.max(
+          1,
+          Math.round((nonfatal * population) / 100000),
+        ),
+      };
+    });
+    const peakYear = modeledTrend.reduce((peak, point) =>
+      point.total > peak.total ? point : peak,
+    ).year;
+    const stateByYear = new Map(
+      stateTrend.map((point) => [point.year, point.total]),
+    );
+    const yearsAboveState = modeledTrend.filter(
+      (point) =>
+        stateByYear.has(point.year) &&
+        point.total > stateByYear.get(point.year)!,
+    ).length;
     const focusAreas =
       county.rate !== null && county.rate > STATE_RATE
         ? [
@@ -256,6 +296,8 @@ export const countyProfiles: Record<string, CountyProfile> = Object.fromEntries(
               ? "Lower than state"
               : "Near state",
       modeledTrend,
+      peakYear,
+      yearsAboveState,
       intentMix,
       agePattern,
       racePattern,

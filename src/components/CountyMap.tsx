@@ -2,11 +2,19 @@ import { useId, useState } from "react";
 import { Link } from "react-router-dom";
 import boundaries from "../data/boundaries.json";
 import { countyData, formatRate, rateColor } from "../lib/data";
-export function CountyMap({ compact = false }: { compact?: boolean }) {
+export function CountyMap({
+  compact = false,
+  dimensional = false,
+}: {
+  compact?: boolean;
+  dimensional?: boolean;
+}) {
   const [active, setActive] = useState<string | null>(null);
   const uid = useId();
   return (
-    <div className={`county-map ${compact ? "compact-map" : ""}`}>
+    <div
+      className={`county-map ${compact ? "compact-map" : ""} ${dimensional ? "dimensional-map" : ""}`}
+    >
       <svg
         viewBox={boundaries.viewBox}
         aria-labelledby={`${uid}-title ${uid}-desc`}
@@ -63,11 +71,11 @@ export function CountyMap({ compact = false }: { compact?: boolean }) {
         <>
           <div className="map-legend" aria-label="Map color legend">
             {[
-              ["#f4d9bd", "Up to 8"],
-              ["#db9a66", "8.1–16"],
-              ["#ba6036", "16.1–24"],
-              ["#753723", "Over 24"],
-              ["#e6e8e5", "Suppressed"],
+              ["#b8d9c3", "Up to 8"],
+              ["#79b0bb", "8.1–16"],
+              ["#2d7898", "16.1–24"],
+              ["#123f61", "Over 24"],
+              ["#dce6eb", "Suppressed"],
             ].map(([color, label]) => (
               <span key={label}>
                 <i style={{ background: color }} />

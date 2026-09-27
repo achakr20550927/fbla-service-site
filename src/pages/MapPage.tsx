@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowUpRight, Search } from "lucide-react";
+import { ArrowUpRight, Layers, Map as MapIcon, Search } from "lucide-react";
 import { CountyMap } from "../components/CountyMap";
 import {
   counties,
@@ -14,6 +14,7 @@ export function MapPage() {
   const [params, setParams] = useSearchParams();
   const query = params.get("query") || "";
   const [sort, setSort] = useState("name");
+  const [dimensional, setDimensional] = useState(true);
   const initialSearch = useRef(query);
   useEffect(() => {
     if (initialSearch.current)
@@ -56,7 +57,41 @@ export function MapPage() {
           View original report <ArrowUpRight size={15} />
         </a>
       </div>
-      <CountyMap />
+      <section
+        className="map-explorer-stage"
+        aria-label="Interactive Maryland map"
+      >
+        <div className="map-view-toolbar">
+          <div>
+            <span>Interactive map</span>
+            <strong>
+              {dimensional ? "Dimensional view" : "Flat data view"}
+            </strong>
+          </div>
+          <div role="group" aria-label="Choose map view">
+            <button
+              className={!dimensional ? "active" : ""}
+              onClick={() => setDimensional(false)}
+            >
+              <MapIcon size={15} /> Flat
+            </button>
+            <button
+              className={dimensional ? "active" : ""}
+              onClick={() => setDimensional(true)}
+            >
+              <Layers size={15} /> Dimensional
+            </button>
+          </div>
+        </div>
+        <CountyMap dimensional={dimensional} />
+        {dimensional && (
+          <p className="dimension-note">
+            Dimensional height and shadow are visual aids. Color still
+            represents the published rate; select any county for its full
+            report.
+          </p>
+        )}
+      </section>
       <section
         className="county-list-section"
         aria-labelledby="county-list-title"

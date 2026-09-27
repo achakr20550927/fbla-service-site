@@ -1,3 +1,4 @@
+import { useId, useState, type CSSProperties } from "react";
 import { stateTrend, PLAN_URL } from "../lib/data";
 
 type TrendPoint = {
@@ -5,7 +6,21 @@ type TrendPoint = {
   total: number;
   homicide: number;
   suicide: number;
+  nonfatal: number;
+  youth: number;
+  fatalityCount: number;
+  nonfatalCount: number;
 };
+
+type SeriesKey = "total" | "homicide" | "suicide" | "nonfatal" | "youth";
+
+const countySeries: { key: SeriesKey; label: string; color: string }[] = [
+  { key: "total", label: "All firearm deaths", color: "#1b6386" },
+  { key: "homicide", label: "Homicide", color: "#d95f3d" },
+  { key: "suicide", label: "Suicide", color: "#668d3f" },
+  { key: "nonfatal", label: "Nonfatal injury", color: "#7d55a6" },
+  { key: "youth", label: "Youth deaths", color: "#d79e22" },
+];
 
 export function CountyTrendChart({
   data,
@@ -14,34 +29,55 @@ export function CountyTrendChart({
   data: TrendPoint[];
   county: string;
 }) {
+  const [series, setSeries] = useState<SeriesKey>("total");
+  const [selectedYear, setSelectedYear] = useState(data.at(-1)?.year ?? 2024);
+  const gradientId = useId().replace(/:/g, "");
+  const selected = countySeries.find((item) => item.key === series)!;
+  const activePoint =
+    data.find((item) => item.year === selectedYear) ?? data.at(-1)!;
   const width = 760;
   const height = 300;
   const left = 46;
   const bottom = 254;
-  const maximum = Math.max(...data.map((item) => item.total), 10) * 1.12;
+  const maximum = Math.max(...data.map((item) => item[series]), 3) * 1.16;
   const x = (index: number) =>
     left + index * ((width - 88) / (data.length - 1));
   const y = (value: number) => bottom - (value / maximum) * 205;
   const points = data
-    .map((item, index) => `${x(index)},${y(item.total)}`)
+    .map((item, index) => `${x(index)},${y(item[series])}`)
     .join(" ");
   return (
     <figure className="trend-chart county-trend-card">
       <figcaption>
         <div>
           <span className="chart-label">MODELED PREVIEW</span>
-          <h3>Five-year pattern</h3>
+          <h3>Ten-year county explorer</h3>
         </div>
-        <strong>{data.at(-1)?.total.toFixed(1)}</strong>
+        <strong style={{ color: selected.color }}>
+          {activePoint[series].toFixed(1)}
+        </strong>
       </figcaption>
       <p>
-        Interface-preview trend scaled from Maryland’s published pattern.
-        Replace with county dashboard exports before publication.
+        Choose an outcome and year to explore a county-specific planning model.
+        Rates are per 100,000 people.
       </p>
+      <div className="series-controls" aria-label="Choose chart outcome">
+        {countySeries.map((item) => (
+          <button
+            key={item.key}
+            className={series === item.key ? "active" : ""}
+            style={{ "--series-color": item.color } as CSSProperties}
+            onClick={() => setSeries(item.key)}
+          >
+            <i />
+            {item.label}
+          </button>
+        ))}
+      </div>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={`Modeled five-year firearm fatality pattern for ${county}`}
+        aria-label={`Modeled ten-year ${selected.label.toLowerCase()} pattern for ${county}`}
       >
         {[0, 0.25, 0.5, 0.75, 1].map((step) => {
           const value = maximum * step;
@@ -61,19 +97,19 @@ export function CountyTrendChart({
           );
         })}
         <defs>
-          <linearGradient id="area-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#26769a" stopOpacity=".28" />
-            <stop offset="100%" stopColor="#26769a" stopOpacity="0" />
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={selected.color} stopOpacity=".3" />
+            <stop offset="100%" stopColor={selected.color} stopOpacity="0" />
           </linearGradient>
         </defs>
         <polygon
           points={`${x(0)},${bottom} ${points} ${x(data.length - 1)},${bottom}`}
-          fill="url(#area-fill)"
+          fill={`url(#${gradientId})`}
         />
         <polyline
           points={points}
           fill="none"
-          stroke="#1b6386"
+          stroke={selected.color}
           strokeWidth="4"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -82,22 +118,52 @@ export function CountyTrendChart({
           <g key={item.year}>
             <circle
               cx={x(index)}
-              cy={y(item.total)}
-              r="5"
-              fill="#fff"
-              stroke="#1b6386"
+              cy={y(item[series])}
+              r={item.year === selectedYear ? "7" : "5"}
+              fill={item.year === selectedYear ? selected.color : "#fff"}
+              stroke={selected.color}
               strokeWidth="3"
+              className="chart-point"
+              onClick={() => setSelectedYear(item.year)}
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setSelectedYear(item.year);
+                }
+              }}
             >
               <title>
-                {item.year}: {item.total.toFixed(1)} per 100,000
+                {item.year} {selected.label}: {item[series].toFixed(1)} per
+                100,000
               </title>
             </circle>
-            <text x={x(index)} y="286" textAnchor="middle">
-              {item.year}
-            </text>
+            {(index % 2 === 0 || index === data.length - 1) && (
+              <text x={x(index)} y="286" textAnchor="middle">
+                {item.year}
+              </text>
+            )}
           </g>
         ))}
       </svg>
+      <div className="year-detail" aria-live="polite">
+        <div>
+          <span>Selected year</span>
+          <strong>{activePoint.year}</strong>
+        </div>
+        <div>
+          <span>{selected.label} rate</span>
+          <strong>{activePoint[series].toFixed(1)}</strong>
+        </div>
+        <div>
+          <span>Estimated firearm deaths</span>
+          <strong>≈ {activePoint.fatalityCount}</strong>
+        </div>
+        <div>
+          <span>Estimated nonfatal injuries</span>
+          <strong>≈ {activePoint.nonfatalCount}</strong>
+        </div>
+      </div>
     </figure>
   );
 }
