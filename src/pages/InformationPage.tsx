@@ -5,6 +5,8 @@ import {
   SNAPSHOT_URL,
   DASHBOARD_URL,
   REVIEWED,
+  CENSUS_POPULATION_URL,
+  SAIPE_URL,
 } from "../lib/data";
 import boundaries from "../data/boundaries.json";
 export function SourcesPage() {
@@ -30,9 +32,8 @@ export function SourcesPage() {
       </p>
       <p>
         These are the published five-year firearm fatality rates per 100,000
-        people. We reproduce the values as displayed, without deriving annual
-        counts or demographic estimates. The statewide five-year comparison rate
-        is 13.4, reported on printed page 9.
+        people. We reproduce the values as displayed. The statewide five-year
+        comparison rate is 13.4, reported on printed page 9.
       </p>
       <h2>Suppression and interpretation</h2>
       <p>
@@ -53,6 +54,36 @@ export function SourcesPage() {
         transcribed from printed page 12 (PDF page 15) of the same report. They
         are explicitly labeled as Maryland-wide figures. The selected intent
         categories may not add up to the total.
+      </p>
+      <h2>County population and economic context: 2024</h2>
+      <p>
+        County population estimates come from the U.S. Census Bureau’s{" "}
+        <a href={CENSUS_POPULATION_URL} target="_blank" rel="noreferrer">
+          2020–2024 County Population Estimates file
+        </a>
+        . Poverty rates and median household income come from the Census
+        Bureau’s{" "}
+        <a href={SAIPE_URL} target="_blank" rel="noreferrer">
+          2024 Small Area Income and Poverty Estimates
+        </a>
+        . These measures describe community context; they do not establish a
+        cause of firearm violence.
+      </p>
+      <h2>Modeled report previews</h2>
+      <p>
+        County reports include clearly marked previews for estimated annual
+        fatalities, county trend lines, intent mix, and demographic
+        distributions. They restore the richer experience of the original
+        project while the team prepares official dashboard exports. Annual
+        fatality estimates are calculated from the published rate and 2024
+        population. Other preview panels use transparent interface models and
+        must not be cited as observed county findings.
+      </p>
+      <p>
+        Preview figures are labeled “Modeled preview” wherever they appear and
+        are excluded when a county rate is suppressed. Replace them with
+        official Maryland dashboard exports before using them in presentations,
+        reports, or policy decisions.
       </p>
       <h2>Statewide snapshot: 2024</h2>
       <p>

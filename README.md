@@ -18,7 +18,7 @@ The site uses React, TypeScript, Vite, and hash routing. Netlify builds `dist` u
 
 ## Data
 
-`src/lib/data.ts` contains source-linked county rates, statewide trends, and resource listings. See `docs/DATA_SOURCES.md` and the website’s Sources & Methodology page before editing any figure. Missing/suppressed rates must remain `null`, never zero. Do not derive annual counts or demographic estimates from rates.
+`src/lib/data.ts` contains source-linked county rates, statewide trends, Census context, modeled interface previews, and resource listings. See `docs/DATA_SOURCES.md` and the website’s Sources & Methodology page before editing any figure. Missing/suppressed rates must remain `null`, never zero. Modeled fields must retain their visible preview labels until replaced by official dashboard exports.
 
 `src/data/boundaries.json` contains simplified MD iMAP geometry in display coordinates. `scripts/build-boundaries.py` reproduces the paths from the documented GeoJSON query.
 

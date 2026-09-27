@@ -47,12 +47,9 @@ export function Layout({ children }: { children: ReactNode }) {
             className="wordmark"
             aria-label="Silence the Violence home"
           >
-            <span className="wordmark-symbol" aria-hidden="true">
-              st<span>v</span>
-              <i />
-            </span>
+            <img className="brand-logo" src="/logo.jpg" alt="" />
             <span>
-              Silence the Violence<small>CENTENNIAL FBLA · MARYLAND</small>
+              Silence the Violence<small>CENTENNIAL HIGH SCHOOL FBLA</small>
             </span>
           </Link>
           <nav aria-label="Main navigation" className="desktop-nav">
@@ -112,8 +109,9 @@ export function Layout({ children }: { children: ReactNode }) {
       <footer className="site-footer">
         <div className="shell footer-main">
           <div>
-            <Link className="footer-brand" to="/">
-              Silence the Violence<span>.</span>
+            <Link className="footer-brand footer-logo-lockup" to="/">
+              <img src="/logo.jpg" alt="" />
+              <span>Silence the Violence</span>
             </Link>
             <p>
               A student-led commitment to safer
@@ -167,7 +165,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </footer>
-      <ResourceGuide />
+      {!pathname.startsWith("/report/") && <ResourceGuide />}
     </>
   );
 }

@@ -13,8 +13,24 @@ URL: https://health.maryland.gov/violence-prevention/Documents/2506_MDH_Prelimin
 - Printed p.12 / PDF p.15: annual statewide total/homicide/suicide rates, 2019–2023.
 - General source: CDC WISQARS accessed April 2025; county footnote also cites CDC WONDER.
 - Suppression: preserve the six suppressed overall county rates as null. The report describes suppression for fatality counts under 20.
-- No county counts, county trend histories, demographic distributions, or personal risk categories are inferred.
+- Published rates remain separate from all derived and modeled fields.
 - Preserve the published values even where independently recomputing them might produce different results; resolve questions against the publisher before changing them.
+
+## 2024 county community context
+
+Population publisher: U.S. Census Bureau, Population Estimates Program.
+Source file: https://www2.census.gov/programs-surveys/popest/datasets/2020-2024/counties/totals/co-est2024-alldata.csv
+
+Poverty and household income publisher: U.S. Census Bureau, Small Area Income and Poverty Estimates.
+Source file: https://www2.census.gov/programs-surveys/saipe/datasets/2024/2024-state-and-county/est24-md.txt
+
+The report uses 2024 population estimates, poverty percentages, and median household income. Community context does not establish causation and is not incorporated into a risk score.
+
+## Modeled report previews
+
+The richer county interface includes deliberately labeled preview values for estimated annual fatalities, county trend histories, intent mix, age, race/ethnicity, and sex. Estimated fatalities are calculated from the published rate and Census population; values remain unavailable for counties whose published rate is suppressed. Trend lines are scaled from the published Maryland pattern. Distribution panels are interface placeholders based on broad urban, suburban, and rural profiles.
+
+These previews are not observed county findings. They are labeled “Modeled preview” in the interface and must be replaced with official Maryland dashboard exports before being cited in a presentation, report, or policy decision.
 
 ## 2024 statewide snapshot
 
@@ -35,7 +51,7 @@ Query: `where=1=1`, `outFields=county,county_fip`, `outSR=3857`, `maxAllowableOf
 
 ## Provider directory
 
-Each resource has its own source URL in `src/lib/data.ts`. Sources are the actual service providers: 988 Lifeline, Grassroots, HopeWorks, 211 Maryland, Howard County Health Department, Project ChildSafe, Crisis Text Line, and University of Maryland Medical Center. Contacts and service descriptions were checked against the provider pages. No effectiveness score or formal partnership is implied. Stock and hours should be reconfirmed by visitors.
+Each resource has its own source URL in `src/lib/data.ts`. Sources are the actual service providers or responsible government programs, including 988 Lifeline, Grassroots, HopeWorks, 211 Maryland, Howard County Health Department, Project ChildSafe, Crisis Text Line, University of Maryland Medical Center, Maryland Legal Aid, Safe Streets Baltimore, and the Maryland firearm violence prevention center. Contacts and service descriptions were checked against provider or government pages. No effectiveness score or formal partnership is implied. Stock and hours should be reconfirmed by visitors.
 
 ## ZIP lookup limitation
 

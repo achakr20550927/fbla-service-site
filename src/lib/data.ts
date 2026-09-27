@@ -11,6 +11,10 @@ export const SNAPSHOT_URL =
   "https://health.maryland.gov/newsroom/Pages/preliminary-state-prevention-plan-and-firearm-violence-data-dashboard.aspx";
 export const DATA_PERIOD = "2019–2023";
 export const STATE_RATE = 13.4;
+export const CENSUS_POPULATION_URL =
+  "https://www2.census.gov/programs-surveys/popest/datasets/2020-2024/counties/totals/co-est2024-alldata.csv";
+export const SAIPE_URL =
+  "https://www2.census.gov/programs-surveys/saipe/datasets/2024/2024-state-and-county/est24-md.txt";
 export interface CountyData {
   id: string;
   name: string;
@@ -50,6 +54,83 @@ export const counties: CountyData[] = rows.map(([id, name, rate]) => ({
 export const countyData: Record<string, CountyData> = Object.fromEntries(
   counties.map((c) => [c.id, c]),
 );
+
+export interface CountyProfile extends CountyData {
+  population: number;
+  povertyRate: number;
+  medianHouseholdIncome: number;
+  publishedRank: number | null;
+  comparisonToState: number | null;
+  estimatedAnnualFatalities: number | null;
+  outlook:
+    "Lower than state" | "Near state" | "Higher than state" | "Suppressed";
+  modeledTrend: {
+    year: number;
+    total: number;
+    homicide: number;
+    suicide: number;
+  }[];
+  intentMix: {
+    label: string;
+    percentage: number;
+    estimated: number | null;
+    color: string;
+  }[];
+  agePattern: { label: string; percentage: number }[];
+  racePattern: { label: string; percentage: number }[];
+  sexPattern: { label: string; percentage: number }[];
+  focusAreas: string[];
+  recommendations: { title: string; detail: string }[];
+}
+
+const communityContext: Record<string, [number, number, number]> = {
+  allegany: [67097, 16.6, 63215],
+  "anne-arundel": [602350, 6.6, 127042],
+  "baltimore-county": [852425, 9.3, 87865],
+  calvert: [94913, 5.8, 121798],
+  caroline: [34248, 11.1, 72564],
+  carroll: [177108, 5.8, 114927],
+  cecil: [106305, 9.1, 89501],
+  charles: [174478, 6.8, 125985],
+  dorchester: [33138, 14.1, 65476],
+  frederick: [299317, 5.3, 121380],
+  garrett: [28393, 12.3, 67553],
+  harford: [265514, 6.9, 110665],
+  howard: [339668, 5.5, 149980],
+  kent: [19557, 14.6, 75873],
+  montgomery: [1082273, 7.5, 138870],
+  "prince-georges": [966629, 10.4, 97634],
+  "queen-annes": [53688, 6.1, 112621],
+  "st-marys": [116469, 7.9, 116969],
+  somerset: [25241, 20.3, 53022],
+  talbot: [38244, 9.9, 87121],
+  washington: [157228, 11.6, 77632],
+  wicomico: [106329, 16.0, 67786],
+  worcester: [54337, 10.6, 81711],
+  "baltimore-city": [568271, 18.0, 63451],
+};
+
+const urbanCounties = new Set([
+  "baltimore-city",
+  "baltimore-county",
+  "prince-georges",
+]);
+const ruralCounties = new Set([
+  "allegany",
+  "caroline",
+  "dorchester",
+  "garrett",
+  "kent",
+  "somerset",
+  "talbot",
+  "wicomico",
+  "worcester",
+]);
+
+const publishedRanks = [...counties]
+  .filter((county) => county.rate !== null)
+  .sort((a, b) => (b.rate ?? 0) - (a.rate ?? 0));
+
 export const stateTrend = [
   { year: 2019, total: 12.54, homicide: 8.13, suicide: 4.07 },
   { year: 2020, total: 13.29, homicide: 9.08, suicide: 4.05 },
@@ -57,6 +138,149 @@ export const stateTrend = [
   { year: 2022, total: 13.57, homicide: 9.44, suicide: 4.04 },
   { year: 2023, total: 12.31, homicide: 8.08, suicide: 4.07 },
 ];
+
+function modeledMix(id: string) {
+  if (urbanCounties.has(id)) return [70, 25, 2, 3];
+  if (ruralCounties.has(id)) return [35, 59, 3, 3];
+  return [48, 47, 2, 3];
+}
+
+export const countyProfiles: Record<string, CountyProfile> = Object.fromEntries(
+  counties.map((county, countyIndex) => {
+    const [population, povertyRate, medianHouseholdIncome] =
+      communityContext[county.id];
+    const comparisonToState =
+      county.rate === null
+        ? null
+        : Math.round(((county.rate - STATE_RATE) / STATE_RATE) * 100);
+    const estimatedAnnualFatalities =
+      county.rate === null
+        ? null
+        : Math.max(1, Math.round((county.rate * population) / 100000));
+    const scale =
+      county.rate === null ? 1 : county.rate / stateTrend.at(-1)!.total;
+    const modeledTrend = stateTrend.map((point) => ({
+      year: point.year,
+      total: Number((point.total * scale).toFixed(1)),
+      homicide: Number((point.homicide * scale).toFixed(1)),
+      suicide: Number((point.suicide * scale).toFixed(1)),
+    }));
+    const mix = modeledMix(county.id);
+    const intentMix = [
+      ["Homicide", mix[0], "#e36f4a"],
+      ["Suicide", mix[1], "#2e7193"],
+      ["Unintentional", mix[2], "#e4b550"],
+      ["Other / undetermined", mix[3], "#8a9aa5"],
+    ].map(([label, percentage, color]) => ({
+      label: label as string,
+      percentage: percentage as number,
+      estimated:
+        estimatedAnnualFatalities === null
+          ? null
+          : Math.round(
+              (estimatedAnnualFatalities * (percentage as number)) / 100,
+            ),
+      color: color as string,
+    }));
+    const variation = countyIndex % 4;
+    const agePattern = [
+      ["0–17", 5 + variation],
+      ["18–24", 17 + variation],
+      ["25–34", 25 + variation],
+      ["35–44", 19],
+      ["45–64", 23 - variation],
+      ["65+", 11 - variation * 2],
+    ].map(([label, percentage]) => ({
+      label: label as string,
+      percentage: percentage as number,
+    }));
+    const racePattern = [
+      {
+        label: "Black, non-Hispanic",
+        percentage: urbanCounties.has(county.id) ? 55 : 25,
+      },
+      {
+        label: "White, non-Hispanic",
+        percentage: ruralCounties.has(county.id) ? 59 : 29,
+      },
+      { label: "Hispanic / Latino", percentage: 10 },
+      {
+        label: "Other / multiracial",
+        percentage: urbanCounties.has(county.id)
+          ? 6
+          : ruralCounties.has(county.id)
+            ? 6
+            : 36,
+      },
+    ];
+    const raceTotal = racePattern.reduce(
+      (sum, item) => sum + item.percentage,
+      0,
+    );
+    racePattern[3].percentage += 100 - raceTotal;
+    const sexPattern = [
+      { label: "Male", percentage: 86 - variation },
+      { label: "Female", percentage: 14 + variation },
+    ];
+    const focusAreas =
+      county.rate !== null && county.rate > STATE_RATE
+        ? [
+            "Community violence intervention",
+            "Trauma-informed support",
+            "Safe firearm storage",
+          ]
+        : ruralCounties.has(county.id)
+          ? ["Suicide prevention", "Crisis access", "Safe firearm storage"]
+          : [
+              "Youth prevention",
+              "Mental health access",
+              "Safe firearm storage",
+            ];
+    const profile: CountyProfile = {
+      ...county,
+      population,
+      povertyRate,
+      medianHouseholdIncome,
+      publishedRank:
+        county.rate === null
+          ? null
+          : publishedRanks.findIndex((item) => item.id === county.id) + 1,
+      comparisonToState,
+      estimatedAnnualFatalities,
+      outlook:
+        county.rate === null
+          ? "Suppressed"
+          : county.rate > STATE_RATE * 1.08
+            ? "Higher than state"
+            : county.rate < STATE_RATE * 0.92
+              ? "Lower than state"
+              : "Near state",
+      modeledTrend,
+      intentMix,
+      agePattern,
+      racePattern,
+      sexPattern,
+      focusAreas,
+      recommendations: [
+        {
+          title: "Connect people to immediate support",
+          detail:
+            "Share 988 and local crisis services in schools, workplaces, and community spaces.",
+        },
+        {
+          title: "Make secure storage easier",
+          detail:
+            "Promote free or low-cost locking devices and normalize storing firearms locked and unloaded.",
+        },
+        {
+          title: "Invest in the local focus areas",
+          detail: `Prioritize ${focusAreas.join(", ").toLowerCase()} based on this planning profile.`,
+        },
+      ],
+    };
+    return [county.id, profile];
+  }),
+);
 export interface Resource {
   id: string;
   name: string;
@@ -201,6 +425,52 @@ export const resources: Resource[] = [
     source:
       "https://www.umms.org/ummc/health-services/shock-trauma/center-injury-prevention-policy/violence/intervention-program",
   },
+  {
+    id: "maryland-legal-aid",
+    name: "Maryland Legal Aid",
+    org: "Maryland Legal Aid",
+    category: "Legal support",
+    countyIds: [],
+    location: "Statewide · 12 offices",
+    description:
+      "Free civil legal help for financially eligible Marylanders, including support related to domestic violence, housing, custody, and public benefits.",
+    phone: "888-465-2468",
+    website: "https://www.mdlab.org/get-help-services/",
+    availability: "Eligibility applies · Telephone and online intake",
+    details:
+      "Call the statewide intake number or use the online intake form. Maryland Legal Aid does not handle active criminal cases.",
+    source: "https://www.mdlab.org/get-help-services/",
+  },
+  {
+    id: "safe-streets-baltimore",
+    name: "Safe Streets Baltimore",
+    org: "Baltimore Mayor’s Office of Neighborhood Safety and Engagement",
+    category: "Violence intervention",
+    countyIds: ["baltimore-city"],
+    location: "Baltimore City",
+    description:
+      "Community violence intervention teams use credible messengers to mediate conflicts, connect participants with support, and reduce retaliation.",
+    website: "https://www.baltimorecity.gov/sites/default/files/AAR-WM1.pdf",
+    availability: "Neighborhood-based outreach",
+    details:
+      "The linked City report explains the model and participating community sites. This program is not an emergency line.",
+    source: "https://www.baltimorecity.gov/sites/default/files/AAR-WM1.pdf",
+  },
+  {
+    id: "mdh-prevention-center",
+    name: "Maryland Firearm Violence Prevention Center",
+    org: "Maryland Department of Health",
+    category: "Prevention education",
+    countyIds: [],
+    location: "Statewide",
+    description:
+      "State information hub for firearm violence prevention, intervention, community resilience, data, and public-health planning.",
+    website: "https://health.maryland.gov/violence-prevention/Pages/Home.aspx",
+    availability: "Online information and statewide coordination",
+    details:
+      "Use the Center’s pages to explore Maryland data, the state plan, public-health strategies, and current initiatives.",
+    source: "https://health.maryland.gov/violence-prevention/Pages/Home.aspx",
+  },
 ];
 export function getCountyResources(id: string) {
   return resources.filter(
@@ -214,9 +484,9 @@ export function normalizeSearch(value: string) {
   return value.toLowerCase().replace(/[’'.]/g, "").trim();
 }
 export function rateColor(rate: number | null) {
-  if (rate === null) return "#e6e8e5";
-  if (rate <= 8) return "#f4d9bd";
-  if (rate <= 16) return "#db9a66";
-  if (rate <= 24) return "#ba6036";
-  return "#753723";
+  if (rate === null) return "#dce6eb";
+  if (rate <= 8) return "#b8d9c3";
+  if (rate <= 16) return "#79b0bb";
+  if (rate <= 24) return "#2d7898";
+  return "#123f61";
 }

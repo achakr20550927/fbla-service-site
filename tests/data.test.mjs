@@ -9,6 +9,7 @@ import {
   formatRate,
   normalizeSearch,
   stateTrend,
+  countyProfiles,
 } from "../src/lib/data.ts";
 import {
   getCountyByZipcode,
@@ -27,6 +28,23 @@ test("all 24 Maryland jurisdictions have matching, nonempty map geometry", () =>
     new Set(counties.map((c) => c.id)),
   );
   for (const county of boundaries.counties) assert.match(county.path, /^M.+Z$/);
+});
+test("every county profile contains official context and labeled model inputs", () => {
+  assert.equal(Object.keys(countyProfiles).length, 24);
+  for (const county of counties) {
+    const profile = countyProfiles[county.id];
+    assert.ok(profile.population > 19000);
+    assert.ok(profile.povertyRate > 0 && profile.povertyRate < 25);
+    assert.ok(profile.medianHouseholdIncome > 50000);
+    assert.equal(profile.agePattern.reduce((sum, item) => sum + item.percentage, 0), 100);
+    assert.equal(profile.racePattern.reduce((sum, item) => sum + item.percentage, 0), 100);
+    assert.equal(profile.sexPattern.reduce((sum, item) => sum + item.percentage, 0), 100);
+    assert.equal(profile.intentMix.reduce((sum, item) => sum + item.percentage, 0), 100);
+    assert.equal(profile.modeledTrend.length, 5);
+  }
+  assert.equal(countyProfiles.howard.population, 339668);
+  assert.equal(countyProfiles["baltimore-city"].povertyRate, 18);
+  assert.equal(countyProfiles.caroline.estimatedAnnualFatalities, null);
 });
 test("published suppression remains missing data, never zero or an invented estimate", () => {
   assert.deepEqual(
