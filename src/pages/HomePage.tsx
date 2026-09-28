@@ -20,9 +20,9 @@ export function HomePage() {
             <span className="short-rule" />A SAFER MARYLAND STARTS WITH US
           </p>
           <h1>
-            Informed communities.
+            Know Your Area.
             <br />
-            <em>Safer futures.</em>
+            <em>Stay Protected.</em>
           </h1>
           <p className="hero-description">
             Understanding gun violence is a first step toward preventing it.
