@@ -43,15 +43,16 @@ export function MapPage() {
         <p className="eyebrow">MARYLAND · COUNTY EXPLORER</p>
         <h1>Understand your community.</h1>
         <p>
-          Explore published firearm fatality rates across Maryland’s 24
-          jurisdictions. Start with the map or find your county below.
+          Explore firearm fatality rates across all 24 Maryland jurisdictions.
+          Start with the map or find your county below.
         </p>
       </div>
       <div className="data-note">
         <strong>{DATA_PERIOD} reporting period</strong>
         <span>
-          Five-year firearm fatality rates per 100,000 people. Published by MDH
-          in June 2025.
+          Five-year firearm fatality rates per 100,000 people. MDH-published
+          values are supplemented by clearly marked original-site fallbacks for
+          six suppressed jurisdictions.
         </span>
         <a href={`${PLAN_URL}#page=13`} target="_blank" rel="noreferrer">
           View original report <ArrowUpRight size={15} />
@@ -87,7 +88,7 @@ export function MapPage() {
         {dimensional && (
           <p className="dimension-note">
             Dimensional height and shadow are visual aids. Color still
-            represents the published rate; select any county for its full
+            represents the displayed rate; select any county for its full
             report.
           </p>
         )}
@@ -123,7 +124,7 @@ export function MapPage() {
             Sort by
             <select value={sort} onChange={(e) => setSort(e.target.value)}>
               <option value="name">County name</option>
-              <option value="rate">Highest published rate</option>
+              <option value="rate">Highest displayed rate</option>
             </select>
           </label>
         </div>
@@ -144,6 +145,9 @@ export function MapPage() {
               <span className={c.rate === null ? "muted" : "county-value"}>
                 {formatRate(c.rate)}
                 {c.rate !== null && <small> / 100k</small>}
+                {c.rateOrigin === "legacy" && (
+                  <small className="fallback-label">Fallback</small>
+                )}
                 <ArrowUpRight size={17} />
               </span>
             </Link>
@@ -165,10 +169,11 @@ export function MapPage() {
         <div className="reading-note">
           <h3>Read the data with care.</h3>
           <p>
-            “Suppressed” means the source does not publish a rate because of
-            small counts and reliability concerns. It does not mean zero deaths.
-            These historical rates describe communities, not an individual’s
-            safety or current conditions.
+            MDH suppressed six county values because of small counts and
+            reliability concerns. Those counties display the rate used by the
+            original site and are labeled as fallbacks. These historical rates
+            describe communities, not an individual’s safety or current
+            conditions.
           </p>
           <Link className="text-link" to="/sources">
             Sources & methodology <ArrowRightIcon />

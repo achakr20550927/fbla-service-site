@@ -36,10 +36,22 @@ test("every county profile contains official context and labeled model inputs", 
     assert.ok(profile.population > 19000);
     assert.ok(profile.povertyRate > 0 && profile.povertyRate < 25);
     assert.ok(profile.medianHouseholdIncome > 50000);
-    assert.equal(profile.agePattern.reduce((sum, item) => sum + item.percentage, 0), 100);
-    assert.equal(profile.racePattern.reduce((sum, item) => sum + item.percentage, 0), 100);
-    assert.equal(profile.sexPattern.reduce((sum, item) => sum + item.percentage, 0), 100);
-    assert.equal(profile.intentMix.reduce((sum, item) => sum + item.percentage, 0), 100);
+    assert.equal(
+      profile.agePattern.reduce((sum, item) => sum + item.percentage, 0),
+      100,
+    );
+    assert.equal(
+      profile.racePattern.reduce((sum, item) => sum + item.percentage, 0),
+      100,
+    );
+    assert.equal(
+      profile.sexPattern.reduce((sum, item) => sum + item.percentage, 0),
+      100,
+    );
+    assert.equal(
+      profile.intentMix.reduce((sum, item) => sum + item.percentage, 0),
+      100,
+    );
     assert.equal(profile.modeledTrend.length, 10);
     assert.deepEqual(
       profile.modeledTrend.map((point) => point.year),
@@ -54,16 +66,31 @@ test("every county profile contains official context and labeled model inputs", 
   }
   assert.equal(countyProfiles.howard.population, 339668);
   assert.equal(countyProfiles["baltimore-city"].povertyRate, 18);
-  assert.equal(countyProfiles.caroline.estimatedAnnualFatalities, null);
+  assert.ok(countyProfiles.caroline.estimatedAnnualFatalities > 0);
   assert.notDeepEqual(
     countyProfiles.howard.modeledTrend.map((point) => point.total),
     countyProfiles.montgomery.modeledTrend.map((point) => point.total),
   );
 });
-test("published suppression remains missing data, never zero or an invented estimate", () => {
+test("all counties display a rate and legacy fallbacks remain identifiable", () => {
+  assert.equal(
+    counties.every((c) => typeof c.rate === "number" && c.rate > 0),
+    true,
+  );
   assert.deepEqual(
-    counties.filter((c) => c.rate === null).map((c) => c.id),
-    ["caroline", "garrett", "kent", "queen-annes", "somerset", "talbot"],
+    Object.fromEntries(
+      counties
+        .filter((c) => c.rateOrigin === "legacy")
+        .map((c) => [c.id, c.rate]),
+    ),
+    {
+      caroline: 6.3,
+      garrett: 2.1,
+      kent: 2.8,
+      "queen-annes": 3.9,
+      somerset: 16.1,
+      talbot: 4.2,
+    },
   );
   assert.equal(formatRate(null), "Suppressed");
   assert.equal(countyData.howard.rate, 6);

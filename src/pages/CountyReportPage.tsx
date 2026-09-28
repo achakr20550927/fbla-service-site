@@ -204,12 +204,15 @@ export function CountyReportPage() {
           </p>
           <div className="report-scoreboard">
             <article className="score-primary">
-              <span>Published firearm fatality rate</span>
+              <span>
+                {data.rateOrigin === "legacy"
+                  ? "Original-site fallback rate"
+                  : "Published firearm fatality rate"}
+              </span>
               <strong>{formatRate(data.rate)}</strong>
               <small>
-                {data.rate === null
-                  ? "MDH suppressed the value"
-                  : "per 100,000 people"}
+                per 100,000 people
+                {data.rateOrigin === "legacy" ? " · MDH value suppressed" : ""}
               </small>
             </article>
             <article>
@@ -222,12 +225,12 @@ export function CountyReportPage() {
               <small>{data.outlook}</small>
             </article>
             <article>
-              <span>Published rank</span>
+              <span>Displayed rank</span>
               <strong>
                 {data.publishedRank ? `#${data.publishedRank}` : "—"}
               </strong>
               <small>
-                {data.publishedRank ? "of 18 reported rates" : "not ranked"}
+                {data.publishedRank ? "of 24 displayed rates" : "not ranked"}
               </small>
             </article>
             <article>
@@ -261,7 +264,7 @@ export function CountyReportPage() {
                 <h2>One county, several ways to understand the story.</h2>
               </div>
               <p>
-                The published rate is the anchor. Census measures add community
+                The displayed rate is the anchor. Census measures add community
                 context, while clearly marked models show how richer dashboard
                 sections could work.
               </p>
@@ -290,7 +293,7 @@ export function CountyReportPage() {
                   </button>
                 </div>
                 <small>
-                  Derived from published rate × 2024 population; planning
+                  Derived from displayed rate × 2024 population; planning
                   estimate, not an observed count.
                 </small>
               </article>
@@ -345,8 +348,7 @@ export function CountyReportPage() {
               </div>
               <p>
                 Put the county beside Maryland and another jurisdiction using
-                the same published rate period and the same Census context
-                measures.
+                the same rate period and the same Census context measures.
               </p>
             </div>
             <div className="comparison-workbench">
@@ -374,18 +376,32 @@ export function CountyReportPage() {
               </div>
               <div className="compare-rate-grid">
                 {[
-                  { name: data.name, rate: data.rate, tone: "county" },
+                  {
+                    name: data.name,
+                    rate: data.rate,
+                    tone: "county",
+                    origin: data.rateOrigin,
+                  },
                   {
                     name: selectedComparison?.name ?? "Comparison county",
                     rate: selectedComparison?.rate ?? null,
                     tone: "peer",
+                    origin: selectedComparison?.rateOrigin ?? "published",
                   },
-                  { name: "Maryland", rate: STATE_RATE, tone: "state" },
+                  {
+                    name: "Maryland",
+                    rate: STATE_RATE,
+                    tone: "state",
+                    origin: "published",
+                  },
                 ].map((item) => (
                   <article key={item.name} className={`tone-${item.tone}`}>
                     <span>{item.name}</span>
                     <strong>{formatRate(item.rate)}</strong>
-                    <small>firearm deaths per 100,000 · {DATA_PERIOD}</small>
+                    <small>
+                      firearm deaths per 100,000 · {DATA_PERIOD}
+                      {item.origin === "legacy" ? " · fallback" : ""}
+                    </small>
                     <i>
                       <b
                         style={{
@@ -412,9 +428,17 @@ export function CountyReportPage() {
                     </thead>
                     <tbody>
                       <tr>
-                        <th scope="row">Published fatality rate</th>
-                        <td>{formatRate(data.rate)}</td>
-                        <td>{formatRate(selectedComparison.rate)}</td>
+                        <th scope="row">Displayed fatality rate</th>
+                        <td>
+                          {formatRate(data.rate)}
+                          {data.rateOrigin === "legacy" ? " (fallback)" : ""}
+                        </td>
+                        <td>
+                          {formatRate(selectedComparison.rate)}
+                          {selectedComparison.rateOrigin === "legacy"
+                            ? " (fallback)"
+                            : ""}
+                        </td>
                       </tr>
                       <tr>
                         <th scope="row">2024 population estimate</th>
@@ -731,11 +755,12 @@ export function CountyReportPage() {
               <p className="eyebrow">DATA NOTES</p>
               <h2>Know what is published and what is modeled.</h2>
               <p>
-                <strong>Published:</strong> MDH five-year firearm fatality rate
-                and statewide trend. <strong>Official estimates:</strong> Census
-                2024 population, poverty, and household income.{" "}
-                <strong>Modeled preview:</strong> annual counts, county trend,
-                intent, and demographic distributions.
+                <strong>Displayed rate:</strong> MDH five-year firearm fatality
+                rate, with original-site fallbacks for six suppressed counties.{" "}
+                <strong>Official estimates:</strong> Census 2024 population,
+                poverty, and household income. <strong>Modeled preview:</strong>{" "}
+                annual counts, county trend, intent, and demographic
+                distributions.
               </p>
               <div className="method-links">
                 <a

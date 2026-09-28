@@ -31,16 +31,20 @@ export function SourcesPage() {
         CDC WONDER.
       </p>
       <p>
-        These are the published five-year firearm fatality rates per 100,000
-        people. We reproduce the values as displayed. The statewide five-year
-        comparison rate is 13.4, reported on printed page 9.
+        These are five-year firearm fatality rates per 100,000 people. Eighteen
+        county values are reproduced from the MDH report. The statewide
+        five-year comparison rate is 13.4, reported on printed page 9.
       </p>
       <h2>Suppression and interpretation</h2>
       <p>
         The report explains that jurisdiction rates with fatality counts under
-        20 are suppressed to protect privacy and avoid unreliable estimates. We
-        preserve these as “Suppressed”; they are never treated as zero. Six
-        jurisdictions have suppressed overall rates in this source.
+        20 are suppressed to protect privacy and avoid unreliable estimates. Six
+        jurisdictions have suppressed overall rates in that source. To provide a
+        complete 24-jurisdiction explorer, this site displays the historical
+        values used by the original project for Caroline (6.3), Garrett (2.1),
+        Kent (2.8), Queen Anne’s (3.9), Somerset (16.1), and Talbot (4.2). These
+        values are labeled “original-site fallback” and should not be
+        interpreted as MDH-published rates.
       </p>
       <p>
         Color bands are display groupings, not validated risk categories. County
@@ -81,9 +85,10 @@ export function SourcesPage() {
       </p>
       <p>
         Preview figures are labeled “Modeled preview” wherever they appear and
-        are excluded when a county rate is suppressed. Replace them with
-        official Maryland dashboard exports before using them in presentations,
-        reports, or policy decisions.
+        use the displayed rate, including the original-site fallback in the six
+        suppressed jurisdictions. Replace previews with official Maryland
+        dashboard exports before using them in presentations, reports, or policy
+        decisions.
       </p>
       <h2>Statewide snapshot: 2024</h2>
       <p>

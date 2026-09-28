@@ -1,6 +1,7 @@
 /** Values transcribed from MDH's June 27, 2025 preliminary state plan, printed p.10.
- * These are published 2019–2023 five-year firearm fatality rates per 100,000.
- * null means suppressed by the publisher; never convert it to zero or estimate it.
+ * These are 2019–2023 five-year firearm fatality rates per 100,000. Where MDH
+ * suppressed a county value, the displayed fallback is carried over from the
+ * original site and marked with rateOrigin: "legacy" throughout the interface.
  */
 export const REVIEWED = "September 27, 2026";
 export const PLAN_URL =
@@ -19,37 +20,39 @@ export interface CountyData {
   id: string;
   name: string;
   rate: number | null;
+  rateOrigin: "published" | "legacy";
 }
-const rows: [string, string, number | null][] = [
+const rows: [string, string, number, "legacy"?][] = [
   ["allegany", "Allegany County", 9],
   ["anne-arundel", "Anne Arundel County", 8.9],
   ["baltimore-county", "Baltimore County", 13.4],
   ["baltimore-city", "Baltimore City", 44.1],
   ["calvert", "Calvert County", 8.1],
-  ["caroline", "Caroline County", null],
+  ["caroline", "Caroline County", 6.3, "legacy"],
   ["carroll", "Carroll County", 7.4],
   ["cecil", "Cecil County", 13.8],
   ["charles", "Charles County", 13.1],
   ["dorchester", "Dorchester County", 19.8],
   ["frederick", "Frederick County", 6.9],
-  ["garrett", "Garrett County", null],
+  ["garrett", "Garrett County", 2.1, "legacy"],
   ["harford", "Harford County", 10.5],
   ["howard", "Howard County", 6],
-  ["kent", "Kent County", null],
+  ["kent", "Kent County", 2.8, "legacy"],
   ["montgomery", "Montgomery County", 8],
   ["prince-georges", "Prince George’s County", 14.7],
-  ["queen-annes", "Queen Anne’s County", null],
-  ["somerset", "Somerset County", null],
+  ["queen-annes", "Queen Anne’s County", 3.9, "legacy"],
+  ["somerset", "Somerset County", 16.1, "legacy"],
   ["st-marys", "St. Mary’s County", 10.6],
-  ["talbot", "Talbot County", null],
+  ["talbot", "Talbot County", 4.2, "legacy"],
   ["washington", "Washington County", 11.8],
   ["wicomico", "Wicomico County", 9.8],
   ["worcester", "Worcester County", 8.3],
 ];
-export const counties: CountyData[] = rows.map(([id, name, rate]) => ({
+export const counties: CountyData[] = rows.map(([id, name, rate, origin]) => ({
   id,
   name,
   rate,
+  rateOrigin: origin ?? "published",
 }));
 export const countyData: Record<string, CountyData> = Object.fromEntries(
   counties.map((c) => [c.id, c]),

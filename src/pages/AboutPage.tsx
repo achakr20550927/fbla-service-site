@@ -118,8 +118,9 @@ export function AboutPage() {
           <div>
             <h2>Transparency is part of the work.</h2>
             <p>
-              Our data is a dated snapshot of published research. We show what
-              is known and leave suppressed figures unpublished.
+              Our data is a dated snapshot. We identify MDH-published values,
+              original-site fallbacks for suppressed counties, and modeled
+              previews so visitors can understand what each figure represents.
             </p>
           </div>
           <Link className="text-link" to="/sources">
